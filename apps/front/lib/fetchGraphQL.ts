@@ -3,6 +3,11 @@ import { getSession } from "./session";
 
 export const fetchGraphQL = async (query: string, variables?: {}) => {
     try {
+        console.log(`Sending GraphQL Query to ${API_URL}/graphql:`, {
+            queryLength: query?.length,
+            variables
+        });
+
         const res = await fetch(`${API_URL}/graphql`, {
             method: "POST",
             headers: {
