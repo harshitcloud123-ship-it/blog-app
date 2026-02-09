@@ -1,135 +1,64 @@
-# Turborepo starter
+# My Modern Blog: Project Architecture & Functional Document
 
-This Turborepo starter is maintained by the Turborepo core team.
+## 🏗️ System Overview
 
-## Using this example
+The application is a high-performance, full-stack monorepo built using **Turborepo**. It features a modern **Next.js** frontend and a robust **NestJS** GraphQL API, designed for scalability and seamless content management.
 
-Run the following command:
+### Core Tech Stack
 
-```sh
-npx create-turbo@latest
-```
+- **Frontend**: Next.js (App Router), Tailwind CSS, TanStack Query, `jose` (JWT).
+- **Backend**: NestJS, GraphQL (Code-first), Prisma ORM.
+- **Database**: SQLite (Development) / PostgreSQL (Production ready).
+- **Services**: Supabase (Image Storage & Auth Infrastructure).
 
-## What's inside?
+---
 
-This Turborepo includes the following packages/apps:
+## 💎 Key Features & System Engineering Approach
 
-### Apps and Packages
+This project implements several advanced patterns that distinguish it as a production-ready, senior-level application:
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+1.  **State-of-the-Art Authentication**: Utilizing a specialized `proxy.ts` (middleware) layer and `jose` for lightweight, Edge-ready JWT verification. This ensures protected routes (like `/user/*`) are secured with minimal latency.
+2.  **GraphQL Data Sourcing**: A unified GraphQL API ensures the frontend only fetches the data it needs, reducing payload sizes and providing a type-safe contract between systems.
+3.  **Systematic Error Handling**: All critical server actions (Create, Update, Delete) are wrapped in specialized `try...catch` safety blocks. This prevents "NEXT_REDIRECT" UI artifacts and ensures the application degrades gracefully during network failures.
+4.  **CORS & Security Hardening**: Strict CORS policies restricted to the `FRONTEND_URL` and secure, http-only session cookies with `sameSite: "lax"` protection.
+5.  **Optimized SEO Architecture**: Integrated metadata management and semantic HTML structure across all pages (Home, About, Contact) to ensure maximum search engine visibility.
+6.  **Minimalist Logic-Driven UI**: A curated color palette (Blue/White/Slate) focused on readability and a premium "glassmorphic" aesthetic.
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+---
 
-### Utilities
+## 🌊 User Journey & Logic Flow
 
-This Turborepo has some additional tools already setup for you:
+### 1. The Entrance (Landing & Exploration)
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+- **Unified Hero Section**: Users land on a vibrant, typography-focused hero section highlighting the latest blog trends.
+- **Dynamic Post Discovery**: Posts are sourced via GraphQL and rendered with optimized Next.js Image components for fast LCP (Largest Contentful Paint).
 
-### Build
+### 2. The Interaction (Social Layer)
 
-To build all apps and packages, run the following command:
+- **Intelligent Interaction Redirection**: Guest users can see "Like" and "Comment" buttons, but interacting with them triggers a smart redirect to the sign-in page, preserving the user's intent.
+- **Server-Side Enforcement**: All interactions are verified on the server-side to prevent unauthorized mutation attempts.
 
-```
-cd my-turborepo
+---
 
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+## 📊 Blog Data Architecture
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+### **1. Data Sourcing & Flow (`app/page.tsx`)**
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+The Home page is a **Server Component**, sourcing data before it even hits the browser.
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+- **`fetchPosts()`**: Connects to the NestJS API via a prioritized `fetchGraphQL` utility.
+- **Environment Awareness**: The system dynamically switches between `NEXT_PUBLIC_API_URL` and local fallbacks, ensuring zero configuration changes between Dev and Vercel environments.
+- **Session Hydration**: The layout uses `getSession()` to provide a seamless "Logged In" experience across all sub-pages without unnecessary client-side flashes.
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+---
 
-### Develop
+## 🎨 Design & Aesthetic Standards
 
-To develop all apps and packages, run the following command:
+- **Color Palettes**: Uses a "Modern Clean" palette (Blue-600 for actions, Slate-700 for typography, and pure White for depth).
+- **Micro-Animations**: Subtle `hover:scale-[101%]` and `transition-transform` effects on cards provide high-end tactile feedback.
+- **Typography**: Focused on a balanced hierarchy using bold headings and high-contrast body text for a "magazine-style" reading experience.
 
-```
-cd my-turborepo
+---
 
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+> [!IMPORTANT]
+> **Production Safety Rule**: Every mutation (Save Post, Update Post, Delete) is fortified with redirect error protection. This ensures that even in edge cases, the user never sees technical redirect messages, maintaining a premium brand experience.
