@@ -11,6 +11,7 @@
   "scripts": {
     "prebuild": "prisma generate",
     "build": "nest build",
+    "postbuild": "cp -R generated dist/generated 2>/dev/null || xcopy /E /I generated dist\\generated /Y",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "dev": "nest start --watch",
