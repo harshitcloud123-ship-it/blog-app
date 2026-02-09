@@ -1,15 +1,9 @@
-import { PropsWithChildren, ReactNode } from "react";
+import { PropsWithChildren } from "react";
 
-type Props = PropsWithChildren<{
-  modal: ReactNode;
-}>;
-const PostsLayout = ({ children, modal }: Props) => {
-  return (
-    <>
-      {children}
-      {modal}
-    </>
-  );
+type Props = PropsWithChildren<{}>;
+
+const PostsLayout = ({ children }: Props) => {
+  return <>{children}</>;
 };
 
 export default PostsLayout;
