@@ -2,22 +2,30 @@ import { API_URL } from "./constants";
 import { getSession } from "./session";
 
 export const fetchGraphQL = async (query: string, variables?: {}) => {
+    // Force HTTPS for cloud domains to prevent redirect-stripping of the body
+    const safeApiUrl = API_URL.startsWith("http://") && !API_URL.includes("localhost")
+        ? API_URL.replace("http://", "https://")
+        : API_URL;
+
     try {
-        console.log(`Sending GraphQL Query to ${API_URL}/graphql:`, {
-            queryLength: query?.length,
-            variables
+        const body = JSON.stringify({
+            query,
+            variables,
         });
 
-        const res = await fetch(`${API_URL}/graphql`, {
+        console.log(`Sending GraphQL Query to ${safeApiUrl}/graphql:`, {
+            queryLength: query?.length,
+            variables,
+            bodyPreview: body.substring(0, 100) + "..."
+        });
+
+        const res = await fetch(`${safeApiUrl}/graphql`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "apollo-require-preflight": "true",
             },
-            body: JSON.stringify({
-                query,
-                variables,
-            }),
+            body,
         });
 
         if (!res.ok) {
